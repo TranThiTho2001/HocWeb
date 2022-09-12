@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const config = require("./app/config");
 const setupContactRoutes = require("./app/routes/contact.routes");
+
+const { BadRequestError } = require("./app/helpers/errors");
+
 const app = express();
 
 app.use(cors({origin: config.app.origin}));
@@ -13,11 +16,26 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 //simple route
-app.get("/",(req,res)=>{
-    res.json('welcome to contact book application.');
+app.get("/",(req,res) => {
+     res.json('welcome to contact book application.');
+    res.log('hello');
 });
 
 setupContactRoutes(app);
+
+//hanle 404 respone
+app.use((req,res,next) => {
+    next(new BadRequestError(404, "Resource not found"));
+});
+
+
+// define error-handling middleware last, after other app.user() and route calls
+app.use((err,req,res,next) => {
+    console.log(err);
+    res.status(err.statusCode || 500).json({
+        message: err.message || "internal Server Error",
+    }) ;
+}) ;
 //set port, listen for request
 const PORT = config.app.port;
 app.listen(PORT, () => {
