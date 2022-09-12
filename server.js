@@ -15,6 +15,15 @@ app.use(express.json());
 //parse request of conten-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({extended:true}));
 
+const bd = require("./app/models");
+db.mongoose.connect(config.db.url)
+.then(() => {
+    console.log("Connected to the database!");
+})
+.catch((error) => {
+    console.log("Cannot connect to the database!",error);
+    process.exit();
+});
 //simple route
 app.get("/",(req,res) => {
      res.json('welcome to contact book application.');
